@@ -19,6 +19,16 @@ def readNumber(line, index):
     return token, index
 
 
+def readMultipy(line, index):
+    token = {'type': 'MULTIPY'}
+    return token, index + 1
+
+
+def readDevide(line, index):
+    token = {'type': 'DEVIDE'}
+    return token, index + 1
+
+
 def readPlus(line, index):
     token = {'type': 'PLUS'}
     return token, index + 1
@@ -35,6 +45,10 @@ def tokenize(line):
     while index < len(line):
         if line[index].isdigit():
             (token, index) = readNumber(line, index)
+        elif line[index] == '×' or line[index] == '*':
+            (token, index) = readMultipy(line, index)
+        elif line[index] == '÷' or line[index] == '/':
+            (token, index) = readDevide(line, index)
         elif line[index] == '+':
             (token, index) = readPlus(line, index)
         elif line[index] == '-':
@@ -49,6 +63,20 @@ def tokenize(line):
 def evaluate(tokens):
     answer = 0
     tokens.insert(0, {'type': 'PLUS'}) # Insert a dummy '+' token
+    index = 1
+    while index < len(tokens):
+        if tokens[index]['type'] == 'MULTIPY':
+            product = tokens[index - 1]['number'] * tokens[index + 1]['number']
+            tokens[index] = {'type': 'NUMBER', 'number': product}
+            del tokens[index - 1]
+            del tokens[index]
+        elif tokens[index]['type'] == 'DEVIDE':
+            quotient = tokens[index - 1]['number'] / tokens[index + 1]['number']
+            tokens[index] = {'type': 'NUMBER', 'number': quotient}
+            del tokens[index - 1]
+            del tokens[index]
+        index += 1
+    
     index = 1
     while index < len(tokens):
         if tokens[index]['type'] == 'NUMBER':
@@ -75,6 +103,7 @@ def runTest():
     print("==== Test started! ====")
     test("1+2", 3)
     test("1.0+2.1-3", 0.1)
+    test("1+2*3-2", 5)
     print("==== Test finished! ====\n")
 
 runTest()
