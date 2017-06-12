@@ -45,14 +45,14 @@ def tokenize(line):
     while index < len(line):
         if line[index].isdigit():
             (token, index) = readNumber(line, index)
-        elif line[index] == '×' or line[index] == '*':
-            (token, index) = readMultipy(line, index)
-        elif line[index] == '÷' or line[index] == '/':
-            (token, index) = readDevide(line, index)
         elif line[index] == '+':
             (token, index) = readPlus(line, index)
         elif line[index] == '-':
             (token, index) = readMinus(line, index)
+        elif line[index] == '×' or line[index] == '*':
+            (token, index) = readMultipy(line, index)
+        elif line[index] == '÷' or line[index] == '/':
+            (token, index) = readDevide(line, index)
         else:
             print('Invalid character found: ' + line[index])
             exit(1)
@@ -103,7 +103,18 @@ def runTest():
     print("==== Test started! ====")
     test("1+2", 3)
     test("1.0+2.1-3", 0.1)
-    test("1+2*3-2", 5)
+    test("0", 0)
+    test("-1.5-0.7", -2.2)
+    test("2.5×2", 5)
+    test("1+2.5*2", 6)
+    test("0*5.0", 0)
+    test("6÷3", 2)
+    test("10-8/2", 6)
+    test("-10/2", -5)
+    test("0/5", 0)
+    test("-2.5*2+10/2", 0)
+    # マイナスの数値で掛け算、割り算する場合はカッコが必要になる
+    #test("2.5*2/-5", 1)
     print("==== Test finished! ====\n")
 
 runTest()
