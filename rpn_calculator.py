@@ -36,7 +36,13 @@ class Calculator(object):
                 token, index = self.readNumber(line, index)
                 tokens.append(token)
             else:
-                operators.append(line[index])
+                if line[index] == '+' or if line[index] == '-':
+                    if '*' in operators or if '/' in operators:
+                        # これだと一つのみしか演算子を追加できない
+                        tokens.append(operators.pop)
+                    operators.append(line[index])
+                else:
+                    operators.append(line[index])
                 index += 1
         tokens.extend(operators)
         return tokens
@@ -50,5 +56,5 @@ class Calculator(object):
 
 if __name__ == '__main__':
     calc = Calculator()
-    print("1.5+2+3.5")
-    print(calc.evaluate("1.5+2+3.5"))
+    print("1.5+2*1")
+    print(calc.evaluate("1.5+2*1"))
