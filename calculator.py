@@ -19,6 +19,12 @@ def readNumber(line, index):
     return token, index
 
 
+def readNagativeNumber(line, index):
+    token, index = readNumber(line, index)
+    token['number'] = -token['number']
+    return token, index
+
+
 def readMultipy(line, index):
     token = {'type': 'MULTIPY'}
     return token, index + 1
@@ -44,15 +50,18 @@ def tokenize(line):
     index = 0
     while index < len(line):
         if line[index].isdigit():
-            (token, index) = readNumber(line, index)
+            token, index = readNumber(line, index)
         elif line[index] == '+':
-            (token, index) = readPlus(line, index)
+            token, index = readPlus(line, index)
         elif line[index] == '-':
-            (token, index) = readMinus(line, index)
-        elif line[index] == '×' or line[index] == '*':
-            (token, index) = readMultipy(line, index)
-        elif line[index] == '÷' or line[index] == '/':
-            (token, index) = readDevide(line, index)
+            if line[index-1] in '+×*÷/' and line[index+1].isdigit():
+                token, index = readNagativeNumber(line, index+1)
+            else:
+                token, index = readMinus(line, index)
+        elif line[index] in '×*':
+            token, index = readMultipy(line, index)
+        elif line[index] in '÷/':
+            token, index = readDevide(line, index)
         else:
             print('Invalid character found: ' + line[index])
             exit(1)
@@ -70,11 +79,13 @@ def evaluate(tokens):
             tokens[index] = {'type': 'NUMBER', 'number': product}
             del tokens[index - 1]
             del tokens[index]
+            index -= 2
         elif tokens[index]['type'] == 'DEVIDE':
             quotient = tokens[index - 1]['number'] / tokens[index + 1]['number']
             tokens[index] = {'type': 'NUMBER', 'number': quotient}
             del tokens[index - 1]
             del tokens[index]
+            index -= 2
         index += 1
     
     index = 1
@@ -110,11 +121,10 @@ def runTest():
     test("0*5.0", 0)
     test("6÷3", 2)
     test("10-8/2", 6)
-    test("-10/2", -5)
     test("0/5", 0)
     test("-2.5*2+10/2", 0)
-    # マイナスの数値で掛け算、割り算する場合はカッコが必要になる
-    #test("2.5*2/-5", 1)
+    test("2.5*2/-5", -1)
+    test("-2*2.0", -4)
     print("==== Test finished! ====\n")
 
 runTest()
