@@ -1,5 +1,5 @@
 class Calculator(object):
-    def readNumber(self, line, index):
+    def _read_number(self, line, index):
         number = 0
         while index < len(line) and line[index].isdigit():
             number = number * 10 + int(line[index])
@@ -14,12 +14,12 @@ class Calculator(object):
         return number, index
 
 
-    def readNagativeNumber(self, line, index):
-        number, index = self.readNumber(line, index)
+    def _read_nagative_number(self, line, index):
+        number, index = self._read_number(line, index)
         return -number, index
 
 
-    def is_nagative_number(self, line, index):
+    def _is_nagative_number(self, line, index):
         if line[index] == '-' and index == 0:
             return True
         elif line[index] == '-' and line[index-1] in '+×*÷/' and line[index+1].isdigit():
@@ -28,7 +28,7 @@ class Calculator(object):
             return False
 
 
-    def is_low_priority(self, current, stack):
+    def _is_low_priority(self, current, stack):
         if current in '*×/÷' and stack in '*×/÷':
             return True
         elif current in '+-' and stack in '+-*×/÷':
@@ -37,16 +37,16 @@ class Calculator(object):
             return False
 
 
-    def tokenize(self, line):
+    def _tokenize(self, line):
         operators = []
         tokens = []
         index = 0
         while index < len(line):
             if line[index].isdigit():
-                number, index = self.readNumber(line, index)
+                number, index = self._read_number(line, index)
                 tokens.append(number)
-            elif self.is_nagative_number(line, index):
-                number, index = self.readNagativeNumber(line, index+1)
+            elif self._is_nagative_number(line, index):
+                number, index = self._read_nagative_number(line, index+1)
                 tokens.append(number)
             elif line[index] == '(':
                 operators.append(line[index])
@@ -58,7 +58,7 @@ class Calculator(object):
                 index += 1
             elif line[index] in "+-*×/÷":
                 while operators:
-                    if self.is_low_priority(line[index], operators[-1]):
+                    if self._is_low_priority(line[index], operators[-1]):
                         tokens.append(operators.pop())
                     else: break
                 operators.append(line[index])
@@ -70,9 +70,8 @@ class Calculator(object):
 
 
     def evaluate(self, line):
-        tokens = self.tokenize(line)
+        tokens = self._tokenize(line)
         stack = []
-        print(tokens)
         operator = {
             '+': (lambda x, y: x + y),
             '-': (lambda x, y: x - y),
