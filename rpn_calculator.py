@@ -19,7 +19,7 @@ class Calculator(object):
         return -number, index
 
 
-    def isNagativeNumber(self, line, index):
+    def is_nagative_number(self, line, index):
         if line[index] == '-' and index == 0:
             return True
         elif line[index] == '-' and line[index-1] in '+×*÷/' and line[index+1].isdigit():
@@ -28,7 +28,7 @@ class Calculator(object):
             return False
 
 
-    def prioritize(self, current, stack):
+    def is_low_priority(self, current, stack):
         if current in '*×/÷' and stack in '*×/÷':
             return True
         elif current in '+-' and stack in '+-*×/÷':
@@ -45,6 +45,9 @@ class Calculator(object):
             if line[index].isdigit():
                 number, index = self.readNumber(line, index)
                 tokens.append(number)
+            elif self.is_nagative_number(line, index):
+                number, index = self.readNagativeNumber(line, index+1)
+                tokens.append(number)
             elif line[index] == '(':
                 operators.append(line[index])
                 index += 1
@@ -53,12 +56,9 @@ class Calculator(object):
                     tokens.append(operators.pop())
                 operators.pop()
                 index += 1
-            elif self.isNagativeNumber(line, index):
-                number, index = self.readNagativeNumber(line, index+1)
-                tokens.append(number)
             elif line[index] in "+-*×/÷":
                 while operators:
-                    if self.prioritize(line[index], operators[-1]):
+                    if self.is_low_priority(line[index], operators[-1]):
                         tokens.append(operators.pop())
                     else: break
                 operators.append(line[index])
