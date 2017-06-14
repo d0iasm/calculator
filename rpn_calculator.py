@@ -1,17 +1,4 @@
-from enum import Enum
-
-
-class Operator(Enum):
-    PLUS = 0
-    MINUS = 0
-    MULTIPY = 1
-    DEVIDE = 1
-    BRACKET = 2
-
-
 class Calculator(object):
-
-
     def readNumber(self, line, index):
         number = 0
         while index < len(line) and line[index].isdigit():
@@ -28,9 +15,9 @@ class Calculator(object):
 
 
     def prioritize(self, current, stack):
-        if current in '*/' and stack in '*/':
+        if current in '*×/÷' and stack in '*×/÷':
             return True
-        elif current in '+-' and stack in '+-*/':
+        elif current in '+-' and stack in '+-*×/÷':
             return True
         else:
             return False
@@ -55,8 +42,7 @@ class Calculator(object):
                     while operators:
                         if self.prioritize(line[index], operators[-1]):
                             tokens.append(operators.pop())
-                        else:
-                            break
+                        else: break
                     operators.append(line[index])
                 index += 1
         while operators:
@@ -66,8 +52,24 @@ class Calculator(object):
 
     def evaluate(self, line):
         tokens = self.tokenize(line)
-        answer = tokens
-        return answer
+        stack = []
+        operator = {
+            '+': (lambda x, y: x + y),
+            '-': (lambda x, y: x - y),
+            '*': (lambda x, y: x * y),
+            '×': (lambda x, y: x * y),
+            '/': (lambda x, y: x / y),
+            '÷': (lambda x, y: x / y)
+        }
+        for token in tokens:
+            if token not in operator.keys():
+                stack.append(token)
+                continue
+            y = stack.pop()
+            x = stack.pop()
+            stack.append(operator[token](x, y))
+            print('%s %s %s =' % (x, token, y))
+        return stack[0]
 
 
 if __name__ == '__main__':
